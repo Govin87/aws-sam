@@ -43,13 +43,12 @@ jobs:
 
     - name: Deploy the SAM application
       run: |
-        BUCKET_NAME=sam-artifacts-$(aws sts get-caller-identity --query Account --output text)
+        BUCKET_NAME=s3-aws-sam
         sam deploy \
-          --stack-name sam-s3-stack \
+          --stack-name aws-sam \  # Use the existing stack name
           --region us-east-1 \
           --s3-bucket $BUCKET_NAME \
           --capabilities CAPABILITY_IAM \
           --no-confirm-changeset \
           --no-fail-on-empty-changeset \
           --parameter-overrides Environment=prod
-
