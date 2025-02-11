@@ -10,11 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout the repository
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # Configure AWS credentials
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
@@ -22,12 +20,10 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    # Install AWS SAM CLI
     - name: Install AWS SAM CLI
       run: |
         pip install aws-sam-cli
 
-    # Create S3 Bucket if it doesn’t exist
     - name: Create S3 Bucket if it doesn’t exist
       run: |
         BUCKET_NAME=sam-artifacts-$(aws sts get-caller-identity --query Account --output text)
@@ -40,18 +36,11 @@ jobs:
           echo "Bucket already exists: $BUCKET_NAME"
         fi
 
-    # Build the SAM application
     - name: Build the SAM application
       run: |
         sam build
 
-    # Deploy the SAM application 
-    - name: Deploy the SAM application
+    - name: Deploy the SAM application (Guided)
       run: |
-        sam deploy --guided\
-          --stack-name sam-s3-stack \
-          --s3-bucket sam-artifacts-$(aws sts get-caller-identity --query Account --output text) \
-          --no-confirm-changeset \
-          --no-fail-on-empty-changeset \
-          --capabilities CAPABILITY_IAM
+        yes "" | sam deploy --guided
 
