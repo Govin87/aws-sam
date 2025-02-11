@@ -29,7 +29,7 @@ jobs:
         BUCKET_NAME=sam-artifacts-$(aws sts get-caller-identity --query Account --output text)
         REGION=us-east-1
         
-        if aws s3 ls "s3://$BUCKET_NAME" 2>&1 | grep -q 'NoSuchBucket'; then
+        if ! aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
           echo "Creating bucket: $BUCKET_NAME"
           aws s3 mb s3://$BUCKET_NAME --region $REGION
         else
@@ -40,7 +40,14 @@ jobs:
       run: |
         sam build
 
-    - name: Deploy the SAM application (Guided)
+    - name: Deploy the SAM application
       run: |
-        yes "" | sam deploy --guided
+        sam deploy --guided \
+          --stack-name sam-s3-stack \
+          --region us-east-1 \
+          --s3-bucket sam-artifacts-$(aws sts get-caller-identity --query Account --output text) \
+          --capabilities CAPABILITY_IAM \
+          --no-confirm-changeset \
+          --no-fail-on-empty-changeset \
+          --parameter-overrides Environment=prod
 
