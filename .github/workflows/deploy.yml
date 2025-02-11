@@ -18,7 +18,6 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
 
       - name: Install AWS SAM CLI
         run: |
@@ -37,7 +36,7 @@ jobs:
           
           # Check if the bucket exists, create if not
           if ! aws s3api head-bucket --bucket $BUCKET_NAME 2>/dev/null; then
-            aws s3api create-bucket --bucket $BUCKET_NAME --region $REGION --create-bucket-configuration LocationConstraint=$REGION
+            aws s3api create-bucket --bucket $BUCKET_NAME --region $REGION --create-bucket-configuration 
           fi
 
           sam deploy \
