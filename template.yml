@@ -5,6 +5,7 @@ Resources:
   MyS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: s3testsam  # Replace with a unique name
-      Region: us-east-1
+      BucketName: !Sub 'gov-test-awssam-${AWS::AccountId}-${AWS::Region}'  # Dynamically generated bucket name using account ID and region
+      # For regions other than 'us-east-1', uncomment the below and set the region accordingly
+      # LocationConstraint: us-west-2  # Specify the correct region
 
