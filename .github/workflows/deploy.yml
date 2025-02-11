@@ -3,37 +3,48 @@ name: Deploy AWS SAM Application
 on:
   push:
     branches:
-      - main  # Trigger on push to the main branch
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-    
-    # Checkout the code from GitHub
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    # Set up AWS CLI
-    - name: Set up AWS CLI
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1  # Change to your desired region
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-    # Install dependencies for AWS SAM
-    - name: Install AWS SAM CLI
-      run: |
-        curl --silent --location https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.tar.gz | sudo tar xz -C /usr/local/bin
+      - name: Install AWS SAM CLI
+        run: |
+          pip install aws-sam-cli
 
-    # Build the SAM application
-    - name: Build SAM Application
-      run: |
-        sam build
+      - name: Build SAM Application
+        run: |
+          sam build
 
-    # Deploy the SAM application to AWS
-    - name: Deploy SAM Application
-      run: |
-        sam deploy --stack-name gov-test-awssasm --capabilities CAPABILITY_IAM --no-confirm-changeset --region us-east-1
+      - name: Deploy SAM Application
+        env:
+          ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          REGION: us-east-1
+        run: |
+          BUCKET_NAME=igov-test-awssam
+          
+          # Check if the bucket exists, create if not
+          if ! aws s3api head-bucket --bucket $BUCKET_NAME 2>/dev/null; then
+            aws s3api create-bucket --bucket $BUCKET_NAME --region $REGION --create-bucket-configuration LocationConstraint=$REGION
+          fi
+
+          sam deploy \
+            --stack-name aws-sam-stack \
+            --s3-bucket $BUCKET_NAME \
+            --region $REGION \
+            --capabilities CAPABILITY_IAM \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset
 
