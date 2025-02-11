@@ -3,49 +3,38 @@ name: Deploy AWS SAM Application
 on:
   push:
     branches:
-      - main   # Trigger deployment on push to main branch
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1   # Set your preferred region
+          aws-region: us-east-1
 
       - name: Install AWS SAM CLI
         run: |
           pip install aws-sam-cli
 
-      - name: Build SAM application
+      - name: Build SAM Application
         run: |
           sam build
 
-      - name: Create S3 bucket if not exists
-        run: |
-          BUCKET_NAME=s3-aws-sam-${{ github.run_id }}
-          if aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
-            echo "Bucket $BUCKET_NAME already exists."
-          else
-            aws s3 mb s3://$BUCKET_NAME --region us-east-1
-            echo "Created bucket: $BUCKET_NAME"
-          fi
-          echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
-
-      - name: Deploy SAM application
+      - name: Deploy SAM Application
         run: |
           sam deploy \
-#            --s3-bucket $BUCKET_NAME \
-	    --resolve-s3 \
             --stack-name aws-sam-stack \
+            --s3-bucket sam-artifacts-664418970006 \
+            --region us-east-1 \
             --capabilities CAPABILITY_IAM \
             --no-confirm-changeset \
-            --region us-east-1
+            --no-fail-on-empty-changeset
 
