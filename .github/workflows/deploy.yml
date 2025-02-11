@@ -43,11 +43,10 @@ jobs:
     - name: Deploy the SAM application
       run: |
         sam deploy \
-          --stack-name sam-s3-stack \
-          --region us-east-1 \
-	  --resolve-s3 \
-          --capabilities CAPABILITY_IAM \
-          --no-confirm-changeset \
-          --no-fail-on-empty-changeset \
-          --parameter-overrides Environment=prod
-
+        --stack-name sam-s3-stack \
+        --region us-east-1 \
+        --resolve-s3 \
+        --capabilities CAPABILITY_IAM \
+        --no-confirm-changeset \
+        --no-fail-on-empty-changeset \
+        --parameter-overrides Environment=prod
