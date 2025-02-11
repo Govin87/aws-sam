@@ -43,7 +43,7 @@ jobs:
           sam deploy \
             --stack-name aws-sam-stack \
             --s3-bucket $BUCKET_NAME \
-            --region $REGION \
+#            --region $REGION \
             --capabilities CAPABILITY_IAM \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset
