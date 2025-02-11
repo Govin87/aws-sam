@@ -45,7 +45,7 @@ jobs:
         sam deploy \
           --stack-name sam-s3-stack \
           --region us-east-1 \
-          --s3-bucket sam-artifacts-$(aws sts get-caller-identity --query Account --output text) \
+	  --resolve-s3 \
           --capabilities CAPABILITY_IAM \
           --no-confirm-changeset \
           --no-fail-on-empty-changeset \
