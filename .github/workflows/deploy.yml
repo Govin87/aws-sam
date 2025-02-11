@@ -45,11 +45,12 @@ jobs:
       run: |
         BUCKET_NAME=s3-aws-sam
         sam deploy \
-          --stack-name aws-sam \  # Use the existing stack name
+          --stack-name aws-sam \
           --region us-east-1 \
           --s3-bucket $BUCKET_NAME \
           --capabilities CAPABILITY_IAM \
           --no-confirm-changeset \
           --no-fail-on-empty-changeset \
-          --parameter-overrides Environment=dev
-	  --disable-rollback 
+          --force-upload \
+          --parameter-overrides Environment=prod \
+          --force
