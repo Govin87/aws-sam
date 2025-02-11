@@ -33,7 +33,7 @@ jobs:
           ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           REGION: us-east-1
         run: |
-          BUCKET_NAME=igov-test-awssam
+          BUCKET_NAME=gov-test-awssam
           
           # Check if the bucket exists, create if not
           if ! aws s3api head-bucket --bucket $BUCKET_NAME 2>/dev/null; then
