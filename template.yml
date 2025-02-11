@@ -5,6 +5,6 @@ Resources:
   MyS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: s3-test-sam  # Replace with a unique name
+      BucketName: s3testsam  # Replace with a unique name
       Region: us-east-1
 
