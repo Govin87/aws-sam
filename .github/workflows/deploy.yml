@@ -52,3 +52,4 @@ jobs:
           --no-confirm-changeset \
           --no-fail-on-empty-changeset \
           --parameter-overrides Environment=dev
+	  --disable-rollback 
