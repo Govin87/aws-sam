@@ -1,34 +1,39 @@
-name: Deploy S3 Bucket with AWS SAM
+name: Deploy AWS SAM Application
 
 on:
   push:
     branches:
-      - main
+      - main  # Trigger on push to the main branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
+    
+    # Checkout the code from GitHub
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
 
+    # Set up AWS CLI
     - name: Set up AWS CLI
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+        aws-region: us-east-1  # Change to your desired region
 
+    # Install dependencies for AWS SAM
     - name: Install AWS SAM CLI
       run: |
-        pip install aws-sam-cli
+        curl --silent --location https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.tar.gz | sudo tar xz -C /usr/local/bin
 
-    - name: Build the SAM application
+    # Build the SAM application
+    - name: Build SAM Application
       run: |
         sam build
 
-    - name: Deploy the SAM application
+    # Deploy the SAM application to AWS
+    - name: Deploy SAM Application
       run: |
-        sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --capabilities CAPABILITY_IAM
+        sam deploy --stack-name gov-test-awssasm --capabilities CAPABILITY_IAM --no-confirm-changeset --region us-east-1
 
