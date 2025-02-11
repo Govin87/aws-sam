@@ -45,10 +45,10 @@ jobs:
       run: |
         sam build
 
-    # Deploy the SAM application (Fixed)
+    # Deploy the SAM application 
     - name: Deploy the SAM application
       run: |
-        sam deploy \
+        sam deploy --guided\
           --stack-name sam-s3-stack \
           --s3-bucket sam-artifacts-$(aws sts get-caller-identity --query Account --output text) \
           --no-confirm-changeset \
