@@ -42,7 +42,8 @@ jobs:
       - name: Deploy SAM application
         run: |
           sam deploy \
-            --s3-bucket $BUCKET_NAME \
+#            --s3-bucket $BUCKET_NAME \
+	    --resolve-s3 \
             --stack-name aws-sam-stack \
             --capabilities CAPABILITY_IAM \
             --no-confirm-changeset \
