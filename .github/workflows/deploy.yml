@@ -1,56 +1,57 @@
-name: Deploy AWS SAM Application
+name: Deploy SAM Application
 
 on:
   push:
     branches:
-      - main
+      - main  # Trigger deployment on pushes to the main branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      # Step 1: Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+      # Step 2: Set up AWS credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1  # Change if you're using a different region
 
-    - name: Install AWS SAM CLI
-      run: |
-        pip install aws-sam-cli
+      # Step 3: Install AWS SAM CLI
+      - name: Install AWS SAM CLI
+        run: |
+          pip install aws-sam-cli
 
-    - name: Create S3 Bucket if it doesn’t exist
-      run: |
-        BUCKET_NAME=sam-artifacts-$(aws sts get-caller-identity --query Account --output text)
-        REGION=us-east-1
+      # Step 4: Build the SAM application
+      - name: Build SAM Application
+        run: |
+          sam build
 
-        # Check if the bucket exists
-        if ! aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
-          echo "Creating bucket: $BUCKET_NAME"
-          aws s3 mb s3://$BUCKET_NAME --region $REGION
-        else
-          echo "Bucket already exists: $BUCKET_NAME"
-        fi
+      # Step 5: Deploy the SAM application
+      - name: Deploy SAM Application
+        run: |
+          BUCKET_NAME=s3-aws-sam
 
-    - name: Build the SAM application
-      run: |
-        sam build
+          # Check if the S3 bucket exists, create if not
+          if ! aws s3 ls "s3://$BUCKET_NAME" 2>&1 | grep -q 'NoSuchBucket'; then
+            echo "Bucket $BUCKET_NAME exists."
+          else
+            echo "Bucket $BUCKET_NAME does not exist. Creating it..."
+            aws s3 mb s3://$BUCKET_NAME
+          fi
 
-    - name: Deploy the SAM application
-      run: |
-        BUCKET_NAME=s3-aws-sam
-        sam deploy \
-          --stack-name aws-sam \
-          --region us-east-1 \
-          --s3-bucket $BUCKET_NAME \
-          --capabilities CAPABILITY_IAM \
-          --no-confirm-changeset \
-          --no-fail-on-empty-changeset \
-          --force-upload \
-          --parameter-overrides Environment=prod \
-          --force
+          # Deploy the SAM application
+          sam deploy \
+            --stack-name aws-sam \
+            --s3-bucket $BUCKET_NAME \
+            --region us-east-1 \
+            --capabilities CAPABILITY_IAM \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --force-upload
+
