@@ -35,7 +35,7 @@ jobs:
       # Step 5: Deploy the SAM application
       - name: Deploy SAM Application
         run: |
-          BUCKET_NAME=s3-aws-sam
+          BUCKET_NAME=test-sam-aws
 
           # Check if the S3 bucket exists, create if not
           if ! aws s3 ls "s3://$BUCKET_NAME" 2>&1 | grep -q 'NoSuchBucket'; then
