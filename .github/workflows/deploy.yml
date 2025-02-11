@@ -51,4 +51,5 @@ jobs:
           --capabilities CAPABILITY_IAM \
           --no-confirm-changeset \
           --no-fail-on-empty-changeset \
-          --parameter-overrides Environment=prod
+          --parameter-overrides Environment=dev
+	  --force-upload
