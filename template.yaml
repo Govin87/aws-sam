@@ -5,7 +5,7 @@ Resources:
   MyS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: s3-aws-sam  # Replace with your unique bucket name
+      BucketName: s3-aws-sam1  # Replace with your unique bucket name
       AccessControl: Private  # Can be set to PublicRead if you want public access
       VersioningConfiguration:
         Status: Enabled  # Optional: Enable versioning if needed
