@@ -29,11 +29,21 @@ jobs:
           sam build
 
       - name: Deploy SAM Application
+        env:
+          ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          REGION: us-east-1
         run: |
+          BUCKET_NAME=sam-artifacts-${ACCOUNT_ID}-${REGION}
+          
+          # Check if the bucket exists, create if not
+          if ! aws s3api head-bucket --bucket $BUCKET_NAME 2>/dev/null; then
+            aws s3api create-bucket --bucket $BUCKET_NAME --region $REGION --create-bucket-configuration LocationConstraint=$REGION
+          fi
+
           sam deploy \
             --stack-name aws-sam-stack \
-            --s3-bucket sam-artifacts-664418970006 \
-            --region us-east-1 \
+            --s3-bucket $BUCKET_NAME \
+            --region $REGION \
             --capabilities CAPABILITY_IAM \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset
