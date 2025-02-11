@@ -45,7 +45,7 @@ jobs:
       run: |
         sam build
 
-    # Deploy the SAM application
+    # Deploy the SAM application (Fixed)
     - name: Deploy the SAM application
       run: |
         sam deploy \
