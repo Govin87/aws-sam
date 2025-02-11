@@ -1,4 +1,4 @@
-name: Deploy S3 Bucket with AWS SAM
+name: Deploy AWS SAM Application
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
       run: |
         BUCKET_NAME=sam-artifacts-$(aws sts get-caller-identity --query Account --output text)
         REGION=us-east-1
-        
+
         # Check if the bucket exists
         if ! aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
           echo "Creating bucket: $BUCKET_NAME"
