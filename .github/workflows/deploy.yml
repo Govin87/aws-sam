@@ -9,40 +9,38 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Set up AWS CLI
-        uses: aws-actions/configure-aws-credentials@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::664418970006:role/GitHubOIDCRole
           aws-region: us-east-1
 
       - name: Install AWS SAM CLI
-        run: |
-          pip install aws-sam-cli
+        run: pip install aws-sam-cli
 
       - name: Build SAM Application
-        run: |
-          sam build
+        run: sam build
 
       - name: Deploy SAM Application
         env:
-          ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-          REGION: us-east-1
+          BUCKET_NAME: govtestawssam
         run: |
-          BUCKET_NAME=govtestawssam
-          
           # Check if the bucket exists, create if not
-          if ! aws s3api head-bucket --bucket $BUCKET_NAME 2>/dev/null; then
-            aws s3api create-bucket --bucket $BUCKET_NAME --region us-east-1  
+          if ! aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
+            aws s3api create-bucket --bucket "$BUCKET_NAME" --region us-east-1
           fi
 
           sam deploy \
             --stack-name aws-sam-stack \
-            --s3-bucket $BUCKET_NAME \
+            --s3-bucket "$BUCKET_NAME" \
             --capabilities CAPABILITY_IAM \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset
